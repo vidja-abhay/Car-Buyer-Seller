@@ -1,0 +1,116 @@
+<template>
+    <div class="slds-card slds-p-around_small">
+        <div class="slds-text-heading_medium slds-p-bottom_medium slds-border_bottom">
+            Buyer: {buyerName}
+        </div>
+        
+        <div class="slds-p-top_medium">
+            <lightning-spinner if:true={isLoading} alternative-text="Loading" size="medium"></lightning-spinner>
+            
+            <template if:true={errorMessage}>
+                <div class="slds-p-around_medium slds-text-color_error">
+                    {errorMessage}
+                </div>
+            </template>
+            
+            <template if:true={noRecords}>
+                <div class="slds-p-around_medium slds-text-align_center">
+                    No matching sellers found for this buyer.
+                </div>
+            </template>
+            
+            <template if:false={noRecords}>
+                <div class="table-container">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped seller-table">
+                        <thead>
+                            <tr class="slds-line-height_reset slds-text-title_caps">
+                                <th scope="col" class="row-number-column">
+                                    <div class="slds-truncate">&nbsp;</div>
+                                </th>
+                                <th scope="col" class="name-column">
+                                    <div class="slds-truncate" title="Seller Name">SELLER NAME</div>
+                                </th>
+                                <th scope="col" class="company-column">
+                                    <div class="slds-truncate" title="Car Company">CAR COMPANY</div>
+                                </th>
+                                <th scope="col" class="model-column">
+                                    <div class="slds-truncate" title="Car Model">CAR MODEL</div>
+                                </th>
+                                <th scope="col" class="color-column">
+                                    <div class="slds-truncate" title="Color">COLOR</div>
+                                </th>
+                                <th scope="col" class="fuel-column">
+                                    <div class="slds-truncate" title="Fuel Type">FUEL TYPE</div>
+                                </th>
+                                <th scope="col" class="engine-column">
+                                    <div class="slds-truncate" title="Engine Type">ENGINE TYPE</div>
+                                </th>
+                                <th scope="col" class="km-column">
+                                    <div class="slds-truncate" title="KM Driven">KM DRIVEN</div>
+                                </th>
+                                <th scope="col" class="price-column">
+                                    <div class="slds-truncate" title="Price">PRICE</div>
+                                </th>
+                                <th scope="col" class="actions-column">
+                                    <div class="slds-truncate" title="Actions">ACTIONS</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={matchingSellers} for:item="seller" for:index="index">
+                                <tr key={seller.id} class={seller.rowClass}>
+                                    <td data-label="Row" class="slds-text-align_center row-number-column">
+                                        {seller.rowNumber}
+                                    </td>
+                                    <td data-label="Seller Name" class="name-column">
+                                        <a href="javascript:void(0);" onclick={handleNavigateToRecord} 
+                                           data-id={seller.potentialSellerId} class="seller-link">
+                                            {seller.potentialSellerName}
+                                        </a>
+                                    </td>
+                                    <td data-label="Car Company" class="company-column">
+                                        <div class="slds-truncate" title={seller.carCompany}>{seller.carCompany}</div>
+                                    </td>
+                                    <td data-label="Car Model" class="model-column">
+                                        <div class="slds-truncate" title={seller.carModel}>{seller.carModel}</div>
+                                    </td>
+                                    <td data-label="Color" class="color-column">
+                                        <div class="slds-truncate" title={seller.color}>{seller.color}</div>
+                                    </td>
+                                    <td data-label="Fuel Type" class="fuel-column">
+                                        <div class="slds-truncate" title={seller.fuelType}>{seller.fuelType}</div>
+                                    </td>
+                                    <td data-label="Engine Type" class="engine-column">
+                                        <div class="slds-truncate" title={seller.engineType}>{seller.engineType}</div>
+                                    </td>
+                                    <td data-label="KM Driven" class="km-column">
+                                        <div class="slds-truncate" title={seller.kilometersDriven}>{seller.kilometersDriven}</div>
+                                    </td>
+                                    <td data-label="Price" class="price-column">
+                                        <div class="slds-truncate" title={seller.price}>{seller.price}</div>
+                                    </td>
+                                    <td data-label="Actions" class="actions-column">
+                                        <div class="button-container">
+                                            <button class="interested-button" 
+                                                data-id={seller.potentialSellerId}
+                                                data-name={seller.potentialSellerName}
+                                                onclick={handleInterested}>
+                                                Interested
+                                            </button>
+                                            <button class="not-interested-button" 
+                                                data-id={seller.potentialSellerId}
+                                                data-name={seller.potentialSellerName}
+                                                onclick={handleNotInterested}>
+                                                Not Interested
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

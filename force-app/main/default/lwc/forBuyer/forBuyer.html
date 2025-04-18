@@ -1,0 +1,146 @@
+<template>
+    <template if:true={showModal2}>
+        <lightning-card title="Filter Panel">
+            <div class="slds-p-around_medium">
+                <!-- Row 1: Budget Min, Budget Max, Car Company, Car Model -->
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-input
+                            type="number"
+                            label="Budget Min"
+                            value={budgetMin}
+                            onchange={handleBudgetMinChange}>
+                        </lightning-input>
+                    </div>
+    
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-input
+                            type="number"
+                            label="Budget Max"
+                            value={budgetMax}
+                            onchange={handleBudgetMaxChange}>
+                        </lightning-input>
+                    </div>
+    
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            name="preferredCarCompany"
+                            label="Preferred Car Company"
+                            value={preferredCarCompany}
+                            options={carCompanyOptionsPickList}
+                            onchange={handleCarCompanyChange}>
+                        </lightning-combobox>
+                    </div>
+    
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            name="preferredCarModel"
+                            label="Preferred Car Model"
+                            value={preferredCarModel}
+                            options={carModelOptionsPickList}
+                            onchange={handleCarModelChange}>
+                        </lightning-combobox>
+                    </div>
+                </div>
+    
+                <!-- Row 2: Color, Km Range, Fuel Type, Year Range -->
+                <div class="slds-grid slds-wrap slds-gutters slds-m-top_medium">
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            name="color"
+                            label="Color"
+                            value={color}
+                            options={colorOptionsPickList}
+                            onchange={handleColorChange}>
+                        </lightning-combobox>
+                    </div>
+    
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-input
+                            type="number"
+                            label="Km Range"
+                            value={kmRange}
+                            min="1"
+                            max="100000"
+                            onchange={handleKmRangeChange}>
+                        </lightning-input>
+                    </div>
+    
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-combobox
+                            name="fuelType"
+                            label="Fuel Type"
+                            value={fuelType}
+                            options={fuelTypeOptionsPickList}
+                            onchange={handleFuelTypeChange}>
+                        </lightning-combobox>
+                    </div>
+    
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-input
+                            type="number"
+                            label="Preferred Year Range"
+                            value={yearRange}
+                            min="1900"
+                            max="2025"
+                            onchange={handleYearRangeChange}>
+                        </lightning-input>
+                    </div>
+                </div>
+    
+                <!-- Apply Button -->
+                <div class="slds-m-top_medium slds-align_absolute-center">
+                    <lightning-button
+                        label="Apply Filters"
+                        onclick={applyFilters}
+                        variant="brand">
+                    </lightning-button>
+                </div>
+    
+                <div class="slds-m-top_medium table-container">
+                    <lightning-card>
+                        <!-- Custom Header Row -->
+                        <div class="slds-grid slds-grid_align-spread slds-p-around_medium slds-border_bottom">
+                            <h2 class="slds-text-heading_small">Matching Sellers</h2>
+                            <lightning-button
+                                label="Create Matching Seller Record"
+                                onclick={handleSave}
+                                variant="brand">
+                            </lightning-button>
+                        </div>
+                
+                        <!-- Table -->
+                        <lightning-datatable
+                            key-field="id"
+                            data={matchingSellers}
+                            columns={sellerColumns}
+                            resize-column-disabled="false"
+                            column-widths-mode="auto"
+                            selected-rows={selectedRows}
+                            onrowselection={handleRowSelection}
+                            show-row-number-column
+                            show-selection>
+                        </lightning-datatable>
+                    </lightning-card>
+                
+                    <!-- Selected Sellers Section -->
+                    <!-- <div class="slds-m-top_medium" if:true={selectedSellerIds.length}>
+                        <lightning-card title="Selected Sellers">
+                            <div class="slds-p-around_medium">
+                                <p>Selected {selectedSellerIds.length} seller(s)</p>
+                                <template for:each={accumulatedSelectedRows} for:item="seller">
+                                    <p key={seller.id} class="slds-m-bottom_xx-small">
+                                        {seller.sellerName} (ID: {seller.id})
+                                    </p>
+                                </template>
+                            </div>
+                        </lightning-card>
+                    </div> -->
+                </div>
+            </div>
+        </lightning-card>
+    
+        <!-- Modal for Confirmation -->
+        
+    </template>
+</template>

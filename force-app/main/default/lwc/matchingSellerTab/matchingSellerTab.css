@@ -1,0 +1,123 @@
+.seller-table {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+}
+
+.row-number-column {
+    width: 40px;
+    text-align: center;
+}
+
+.checkbox-column {
+    width: 50px;
+    text-align: center;
+}
+
+.name-column {
+    width: 150px;
+    max-width: 200px;
+}
+
+.company-column,
+.model-column,
+.color-column,
+.fuel-column,
+.engine-column {
+    width: auto;
+}
+
+.km-column, 
+.price-column {
+    width: 90px;
+    text-align: right;
+    padding-right: 16px; /* Add some padding for better readability */
+}
+
+.actions-column {
+    width: 230px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.interested-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-right: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.not-interested-button {
+    background-color: #D32F2F;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-left: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.seller-link {
+    color: #0070d2;
+    text-decoration: none;
+}
+
+.seller-link:hover {
+    text-decoration: underline;
+}
+
+/* Set alternating row colors */
+.slds-table tbody tr:nth-child(odd) {
+    background-color: #f3f3f3;
+}
+
+.slds-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* Style the table header */
+.slds-table th {
+    font-weight: bold;
+    background-color: #f7f7f7;
+    color: #444;
+    text-transform: uppercase;
+    padding: 8px;
+}
+
+/* Style table cells */
+.slds-table td {
+    padding: 8px;
+    vertical-align: middle;
+}
+
+/* Make sure the buyer header is properly styled */
+.slds-text-heading_medium {
+    font-size: 1.25rem;
+    line-height: 1.25;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2b2826;
+}
