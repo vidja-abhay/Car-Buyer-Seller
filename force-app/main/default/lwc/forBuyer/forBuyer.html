@@ -100,47 +100,43 @@
                 <div class="slds-m-top_medium table-container">
                     <lightning-card>
                         <!-- Custom Header Row -->
-                        <div class="slds-grid slds-grid_align-spread slds-p-around_medium slds-border_bottom">
-                            <h2 class="slds-text-heading_small">Matching Sellers</h2>
-                            <lightning-button
-                                label="Create Matching Seller Record"
-                                onclick={handleSave}
-                                variant="brand">
-                            </lightning-button>
-                        </div>
+                        <template if:false={showNoResultsMessage}>
+                            <div class="slds-grid slds-grid_align-spread slds-p-around_medium slds-border_bottom">
+                                <h2 class="slds-text-heading_small">Matching Sellers</h2>
+                                <lightning-button
+                                    label="Create Matching Seller Record"
+                                    onclick={handleSave}
+                                    variant="brand">
+                                </lightning-button>
+                            </div>
+                        </template>
+                
+                        <!-- No Results Message -->
+                        <template if:true={showNoResultsMessage}>
+                            <div class="slds-p-around_medium slds-align_absolute-center">
+                                <div class="no-results-message">
+                                    No matching sellers found for the selected filters.
+                                </div>
+                            </div>
+                        </template>
                 
                         <!-- Table -->
-                        <lightning-datatable
-                            key-field="id"
-                            data={matchingSellers}
-                            columns={sellerColumns}
-                            resize-column-disabled="false"
-                            column-widths-mode="auto"
-                            selected-rows={selectedRows}
-                            onrowselection={handleRowSelection}
-                            show-row-number-column
-                            show-selection>
-                        </lightning-datatable>
+                        <template if:false={showNoResultsMessage}>
+                            <lightning-datatable
+                                key-field="id"
+                                data={matchingSellers}
+                                columns={sellerColumns}
+                                resize-column-disabled="false"
+                                column-widths-mode="auto"
+                                selected-rows={selectedRows}
+                                onrowselection={handleRowSelection}
+                                show-row-number-column
+                                show-selection>
+                            </lightning-datatable>
+                        </template>
                     </lightning-card>
-                
-                    <!-- Selected Sellers Section -->
-                    <!-- <div class="slds-m-top_medium" if:true={selectedSellerIds.length}>
-                        <lightning-card title="Selected Sellers">
-                            <div class="slds-p-around_medium">
-                                <p>Selected {selectedSellerIds.length} seller(s)</p>
-                                <template for:each={accumulatedSelectedRows} for:item="seller">
-                                    <p key={seller.id} class="slds-m-bottom_xx-small">
-                                        {seller.sellerName} (ID: {seller.id})
-                                    </p>
-                                </template>
-                            </div>
-                        </lightning-card>
-                    </div> -->
                 </div>
             </div>
         </lightning-card>
-    
-        <!-- Modal for Confirmation -->
-        
     </template>
 </template>

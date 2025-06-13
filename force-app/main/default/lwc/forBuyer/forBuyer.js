@@ -4,6 +4,7 @@ import { CurrentPageReference } from 'lightning/navigation';
 import getPicklistValues from '@salesforce/apex/PicklistController.getPicklistValues';
 import getMatchingSellers from '@salesforce/apex/Buyer.getMatchingSellers';
 import savePotentialBuyerSeller from '@salesforce/apex/Buyer.savePotentialBuyerSeller';
+import getExistingPotentialSellerIds from '@salesforce/apex/Buyer.getExistingPotentialSellerIds';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
 
@@ -37,7 +38,8 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
     };
 
     @track matchingSellers = [];
-
+    @track existingSellerIds = [];
+    @track showNoResultsMessage = false;
     @track showModal2 = true;
 
     @wire(CurrentPageReference)
@@ -66,7 +68,16 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
         { label: 'Color', fieldName: 'color', type: 'text', initialWidth: 150, sortable: true  },
         { label: 'Kilometers Driven', fieldName: 'kmDriven', type: 'number', initialWidth: 150, sortable: true  },
         { label: 'Fuel Type', fieldName: 'fuelType', type: 'text', initialWidth: 150, sortable: true  },
-        { label: 'Year of Manufacture', fieldName: 'year', type: 'number', initialWidth: 150, sortable: true  }
+        { label: 'Year of Manufacture', fieldName: 'year', type: 'number', initialWidth: 150, sortable: true  },
+        { 
+            label: 'Status', 
+            fieldName: 'status', 
+            type: 'text',
+            cellAttributes: { 
+                class: { fieldName: 'statusClass' }
+            },
+            initialWidth: 150
+        }
     ];
 
     connectedCallback(){
@@ -75,6 +86,7 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
             console.log('Record ID:', this.recordId);
             this.fetchBuyerDetails();
             this.fetchPicklistValues();
+            this.fetchExistingSellerIds();
         }
     }
 
@@ -91,11 +103,55 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
                     max-height: 100%;
                     min-height: 480px;
                 }
+                .existing-seller {
+                    color: #706e6b !important;
+                    font-style: italic;
+                }
+                .no-results-message {
+                    color: #c23934;
+                    font-size: 18px;
+                    font-weight: bold;
+                    text-align: center;
+                    padding: 20px;
+                }
             `;
-            this.template.appendChild(STYLE); // append to template instead of lightning-card
+            this.template.appendChild(STYLE);
         }
     }
+
+    fetchExistingSellerIds() {
+        getExistingPotentialSellerIds({ buyerId: this.recordId })
+            .then(result => {
+                this.existingSellerIds = result;
+                console.log('Existing Seller IDs:', JSON.stringify(this.existingSellerIds));
+                // If we already have matching sellers, update them with status
+                if (this.matchingSellers.length > 0) {
+                    this.updateMatchingSellersStatus();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching existing seller IDs:', error);
+            });
+    }
     
+    updateMatchingSellersStatus() {
+        this.matchingSellers = this.matchingSellers.map(seller => {
+            if (this.existingSellerIds.includes(seller.id)) {
+                return {
+                    ...seller,
+                    status: 'Already Added',
+                    statusClass: 'existing-seller',
+                    disabled: true
+                };
+            }
+            return {
+                ...seller,
+                status: 'Available',
+                statusClass: '',
+                disabled: false
+            };
+        });
+    }
 
     fetchBuyerDetails() {
         getBuyerDetails({ buyerId: this.recordId })
@@ -125,7 +181,7 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
             })
             .catch(error => {
                 console.error('Error in fetching buyer details:', error);
-                this.showToast('Error', 'Failed to fetch buyer details', 'error',   'dismissible');
+                this.showToast('Error', 'Failed to fetch buyer details', 'error', 'dismissible');
             });
     }
 
@@ -141,27 +197,45 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
             budgetMax: this.budgetMax
         })
             .then(result => {
-                // Transform the data for the datatable with required fields
-                this.matchingSellers = result.map(seller => {
-                    return {
-                        id: seller.Id,
-                        sellerName: seller.Name,
-                        sellerUrl: '/' + seller.Id, // Creates a relative URL to the record
-                        email: seller.Email,
-                        phone: seller.Phone,
-                        carCompany: seller.Company__c,
-                        carModel: seller.Car_Model__c,
-                        color: seller.Color__c,
-                        kmDriven: seller.Kilometers_Driven__c,
-                        fuelType: seller.Fuel_Type__c,
-                        year: seller.Year_of_Manufacture__c
-                    };
-                });
-                console.log('Transformed Matching Sellers:', JSON.stringify(this.matchingSellers));
+                // Check if the result is empty
+                if (!result || result.length === 0) {
+                    this.matchingSellers = [];
+                    this.showNoResultsMessage = true;
+                    console.log('No matching sellers found');
+                } else {
+                    // Transform the data for the datatable with required fields
+                    this.matchingSellers = result.map(seller => {
+                        return {
+                            id: seller.Id,
+                            sellerName: seller.Name,
+                            sellerUrl: '/' + seller.Id, // Creates a relative URL to the record
+                            email: seller.Email,
+                            phone: seller.Phone,
+                            carCompany: seller.Company__c,
+                            carModel: seller.Car_Model__c,
+                            color: seller.Color__c,
+                            kmDriven: seller.Kilometers_Driven__c,
+                            fuelType: seller.Fuel_Type__c,
+                            year: seller.Year_of_Manufacture__c,
+                            status: 'Available',
+                            statusClass: ''
+                        };
+                    });
+                    this.showNoResultsMessage = false;
+                    console.log('Transformed Matching Sellers:', JSON.stringify(this.matchingSellers));
+                    
+                    // If we have existing seller IDs, update the matching sellers with status
+                    if (this.existingSellerIds.length > 0) {
+                        this.updateMatchingSellersStatus();
+                    }
+                }
             })
             .catch(error => {
                 console.error('Error in fetching matching sellers:', error);
                 this.showToast('Error', 'Failed to fetch matching sellers', 'error', 'dismissible');
+                // Clear the array on error and show no results message
+                this.matchingSellers = [];
+                this.showNoResultsMessage = true;
             });
     }
 
@@ -251,14 +325,26 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
         // Get current selected rows from the datatable
         const currentSelectedRows = event.detail.selectedRows;
         
+        // Filter out already added sellers
+        const validSelectedRows = currentSelectedRows.filter(row => 
+            !this.existingSellerIds.includes(row.id)
+        );
+        
+        // If any invalid selection was made, update the datatable selection
+        if (validSelectedRows.length !== currentSelectedRows.length) {
+            this.showToast('Info', 'Sellers are already added and cannot be selected again', 'info', 'dismissible');
+            
+            // Need to tell the datatable which rows should be selected
+            this.template.querySelector('lightning-datatable').selectedRows = validSelectedRows.map(row => row.id);
+        }
+        
         // Create a map of IDs for easy lookup
         const selectedRowsMap = new Map();
-        currentSelectedRows.forEach(row => {
+        validSelectedRows.forEach(row => {
             selectedRowsMap.set(row.id, row);
         });
         
         // Update the accumulated selected rows based on the current selection
-        // This will contain only the currently selected rows
         this.accumulatedSelectedRows = Array.from(selectedRowsMap.values());
         
         // Update the selectedSellerIds based on the current selection
@@ -295,25 +381,35 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
                 actionName: 'view'
             }
         });
-      }
-      
+    }
     
-
     // Save the selected sellers
     handleSave() {
+        if (this.showNoResultsMessage) {
+            this.showToast('Warning', 'No matching sellers found to select', 'warning', 'dismissible');
+            return;
+        }
+
         if (this.selectedSellerIds.length === 0) {
             this.showToast('Warning', 'Please select at least one seller', 'warning', 'dismissible');
             return;
         }
 
+        // Filter out any selected sellers that are already in potentials
+        const newSellerIds = this.selectedSellerIds.filter(sellerId => 
+            !this.existingSellerIds.includes(sellerId)
+        );
+
+        if (newSellerIds.length === 0) {
+            this.showToast('Warning', 'All selected sellers are already added as potentials', 'warning', 'dismissible');
+            return;
+        }
         
-        // Create records for each selected seller
-        const promises = this.selectedSellerIds.map(sellerId => {
+        // Create records for each valid selected seller
+        const promises = newSellerIds.map(sellerId => {
             const seller = this.accumulatedSelectedRows.find(row => row.id === sellerId);
             return this.createPotentialBuyerSellerRecord(sellerId, seller.sellerName);
         });
-
-        
 
         // Wait for all records to be created
         Promise.all(promises)
@@ -349,3 +445,5 @@ export default class ForBuyer extends NavigationMixin(LightningElement) {
         );
     }
 }
+
+

@@ -200,4 +200,26 @@ public class Buyer {
         return results;
     }
 
+    @AuraEnabled
+    public static List<String> getExistingPotentialSellerIds(Id buyerId) {
+        List<String> existingSellerIds = new List<String>();
+        
+        try {
+            List<Potential_Buyer_Seller__c> existingRecords = [
+                SELECT Potential_Seller__c
+                FROM Potential_Buyer_Seller__c
+                WHERE Potential_Buyer__c = :buyerId
+            ];
+            
+            for (Potential_Buyer_Seller__c record : existingRecords) {
+                existingSellerIds.add(record.Potential_Seller__c);
+            }
+            
+            return existingSellerIds;
+        } catch (Exception e) {
+            System.debug('Error getting existing potential seller IDs: ' + e.getMessage());
+            return existingSellerIds;
+        }
+    }
+
 }
