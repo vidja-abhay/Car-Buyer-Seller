@@ -22,6 +22,7 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           echo "$PR_BODY" > ./pr_body.txt
+          npm i
           node ./parsePR.js
           TESTS=$(cat testsToRun.txt)
           echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV
