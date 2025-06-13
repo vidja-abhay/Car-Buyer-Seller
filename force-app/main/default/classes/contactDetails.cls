@@ -4,7 +4,7 @@ public with sharing class contactDetailss {
     public static List<Contact> getContactList() {
         try {
             return [
-                SELECT Id, Email, Phone, AccountId 
+                SELECT Id, Phone, AccountId 
                 FROM Contact 
                 ORDER BY LastName ASC 
                 LIMIT 100
