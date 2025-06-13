@@ -77,7 +77,7 @@ public class Buyer {
         
         // Validate input parameters
         if (budgetMin > budgetMax) {
-            System.debug('Budget Minimum should be greater than Budget Maximum. Ignoring input values!');
+            // System.debug('Budget Minimum should be greater than Budget Maximum. Ignoring input values!');
             return new List<Lead>();
         } 
         
